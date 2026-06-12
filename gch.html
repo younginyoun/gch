@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeoPick 전자제품 쇼핑몰 - 계층형 구조</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      background: #f5f7fb;
+      color: #1f2937;
+    }
+    button, input, select { font-family: inherit; }
+
+    .top-banner {
+      background: linear-gradient(90deg, #2563eb, #1d4ed8);
+      color: white;
+      text-align: center;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .experiment-bar {
+      background: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 12px 16px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      position: sticky;
+      top: 0;
+      z-index: 70;
+    }
+
+    .experiment-bar input {
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      min-width: 140px;
+    }
+
+    .experiment-btn {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .experiment-btn.start { background: #2563eb; color: white; }
+    .experiment-btn.stop { background: #ef4444; color: white; }
+    .experiment-btn.view { background: #10b981; color: white; }
+    .experiment-btn.reset { background: #f3f4f6; color: #111827; }
+
+    .task-display,
+    .experiment-status {
+      width: 100%;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .task-display {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+      border-radius: 12px;
+      padding: 10px 14px;
+      max-width: 960px;
+      line-height: 1.5;
+    }
+
+    .experiment-status {
+      color: #374151;
+    }
+
+    .result-box {
+      width: 100%;
+      max-width: 960px;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #374151;
+      display: none;
+    }
+
+    .result-box strong {
+      color: #111827;
+    }
+
+    header {
+      position: sticky;
+      top: 178px;
+      z-index: 50;
+      background: white;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      font-size: 26px;
+      font-weight: 800;
+      color: #2563eb;
+      min-width: 130px;
+      cursor: pointer;
+    }
+
+    .search-wrap {
+      flex: 1;
+      display: flex;
+      min-width: 260px;
+      gap: 10px;
+    }
+
+    .search-wrap input, .search-wrap select {
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 14px;
+      background: #fff;
+    }
+
+    .search-wrap input { flex: 1; }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .chip-btn {
+      border: 1px solid #d1d5db;
+      background: white;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 24px auto;
+      padding: 0 20px 40px;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .hero {
+      padding: 28px;
+      background: linear-gradient(135deg, #eff6ff, #ffffff);
+      display: grid;
+      grid-template-columns: 1.3fr 0.7fr;
+      gap: 18px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      margin: 0 0 12px;
+      font-size: 34px;
+      line-height: 1.25;
+    }
+
+    .hero p {
+      margin: 0 0 18px;
+      font-size: 15px;
+      color: #4b5563;
+      line-height: 1.6;
+    }
+
+    .hero-tags {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .hero-tag {
+      background: white;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+      padding: 9px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .hero-card {
+      background: white;
+      border-radius: 18px;
+      padding: 20px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .hero-card h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+
+    .hero-card ul {
+      margin: 0;
+      padding-left: 18px;
+      color: #4b5563;
+      line-height: 1.8;
+      font-size: 14px;
+    }
+
+    .breadcrumb {
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    .breadcrumb strong {
+      color: #111827;
+    }
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .home-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .category-card {
+      padding: 22px;
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      background: white;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .category-card:hover, .product-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.08);
+    }
+
+    .category-emoji {
+      font-size: 42px;
+      margin-bottom: 10px;
+    }
+
+    .category-name {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .category-desc {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #4b5563;
+      min-height: 44px;
+    }
+
+    .category-count {
+      margin-top: 14px;
+      font-size: 13px;
+      color: #2563eb;
+      font-weight: 700;
+    }
+
+    .list-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 22px;
+    }
+
+    .sidebar {
+      padding: 20px;
+      align-self: start;
+      position: sticky;
+      top: 270px;
+    }
+
+    .sidebar h3 {
+      margin: 0 0 16px;
+      font-size: 18px;
+    }
+
+    .filter-block { margin-bottom: 24px; }
+    .filter-block h4 {
+      margin: 0 0 12px;
+      font-size: 14px;
+      color: #374151;
+    }
+
+    .filter-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .filter-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+    }
+
+    .price-range {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .price-range input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid #d1d5db;
+    }
+
+    .apply-btn, .reset-btn, .back-btn {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      margin-top: 10px;
+    }
+
+    .apply-btn {
+      background: #2563eb;
+      color: white;
+    }
+
+    .reset-btn, .back-btn {
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+
+    .content-panel {
+      padding: 20px;
+    }
+
+    .stats-bar {
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .stats-left {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .stat-box {
+      font-size: 14px;
+      color: #4b5563;
+    }
+
+    .stat-box strong {
+      display: block;
+      color: #111827;
+      font-size: 18px;
+      margin-bottom: 2px;
+    }
+
+    .sort-box select {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .product-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      padding: 16px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+      cursor: pointer;
+    }
+
+    .thumb {
+      height: 150px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 54px;
+      background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+    }
+
+    .badge-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+
+    .category-label {
+      font-size: 12px;
+      color: #6b7280;
+      font-weight: 700;
+    }
+
+    .product-name {
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1.4;
+      min-height: 44px;
+    }
+
+    .meta {
+      font-size: 13px;
+      color: #4b5563;
+      line-height: 1.6;
+    }
+
+    .price {
+      font-size: 22px;
+      font-weight: 800;
+      color: #111827;
+    }
+
+    .sub-price {
+      font-size: 12px;
+      color: #6b7280;
+      text-decoration: line-through;
+      margin-left: 6px;
+      font-weight: 500;
+    }
+
+    .rating {
+      font-size: 13px;
+      color: #f59e0b;
+      font-weight: 700;
+    }
+
+    .shipping {
+      font-size: 13px;
+      color: #2563eb;
+      font-weight: 700;
+    }
+
+    .detail-layout {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .detail-thumb {
+      height: 360px;
+      border-radius: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #eff6ff, #e5e7eb);
+      font-size: 110px;
+    }
+
+    .detail-card {
+      padding: 24px;
+    }
+
+    .detail-title {
+      font-size: 30px;
+      font-weight: 800;
+      margin: 0 0 10px;
+    }
+
+    .detail-meta {
+      font-size: 15px;
+      color: #4b5563;
+      line-height: 1.7;
+      margin-bottom: 18px;
+    }
+
+    .detail-price {
+      font-size: 30px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .detail-grid-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+      margin-bottom: 20px;
+    }
+
+    .info-box {
+      padding: 14px;
+      border-radius: 16px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .info-box strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #111827;
+    }
+
+    .detail-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .primary-btn, .ghost-btn, .select-btn {
+      border-radius: 12px;
+      padding: 12px 16px;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .primary-btn, .select-btn {
+      background: #2563eb;
+      color: white;
+    }
+
+    .ghost-btn {
+      background: #f3f4f6;
+      color: #111827;
+    }
+
+    .empty-state {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+      color: #6b7280;
+      font-size: 15px;
+    }
+
+    footer {
+      margin-top: 26px;
+      padding: 24px 20px 42px;
+      text-align: center;
+      color: #6b7280;
+      font-size: 13px;
+    }
+
+    @media (max-width: 1180px) {
+      .home-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .hero { grid-template-columns: 1fr; }
+      .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .detail-layout { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 900px) {
+      .list-layout { grid-template-columns: 1fr; }
+      .sidebar { position: static; }
+      .home-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 640px) {
+      .header-inner { padding: 12px 14px; }
+      .container { padding: 0 14px 30px; }
+      .home-grid, .product-grid { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 28px; }
+      .detail-grid-info { grid-template-columns: 1fr; }
+      header { top: 230px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="top-banner">실험용 프로토타입 · 전자제품 종합 쇼핑몰 · 계층형 정보 구조</div>
+
+  <div class="experiment-bar">
+    <input type="text" id="participantId" placeholder="참가자 번호 예: P1" />
+    <input type="text" id="taskNumber" placeholder="문제 번호 1~6" />
+    <button class="experiment-btn start" id="startExperimentBtn">실험 시작</button>
+    <button class="experiment-btn stop" id="stopExperimentBtn">실험 종료</button>
+    <button class="experiment-btn view" id="viewResultBtn">결과 보기</button>
+    <button class="experiment-btn reset" id="resetExperimentBtn">기록 초기화</button>
+    <div class="task-display" id="taskDisplay">문제 번호를 1~6 중 하나로 입력하면 여기 표시됨</div>
+    <div class="experiment-status" id="experimentStatus">실험 대기 중</div>
+    <div class="result-box" id="resultBox"></div>
+  </div>
+
+  <header>
+    <div class="header-inner">
+      <div class="logo" id="logoBtn">NeoPick</div>
+      <div class="search-wrap">
+        <input type="text" id="searchInput" placeholder="상품명, 카테고리, 특징 검색" />
+        <select id="headerCategorySelect">
+          <option value="all">전체 카테고리</option>
+          <option value="이어폰">이어폰</option>
+          <option value="헤드셋">헤드셋</option>
+          <option value="키보드">키보드</option>
+          <option value="마우스">마우스</option>
+          <option value="태블릿">태블릿</option>
+          <option value="충전기">충전기</option>
+          <option value="보조배터리">보조배터리</option>
+        </select>
+      </div>
+      <div class="header-actions">
+        <button class="chip-btn">최근 본 상품</button>
+        <button class="chip-btn">장바구니 0</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero panel">
+      <div>
+        <h1>단계적으로 탐색하는 계층형 전자제품 쇼핑몰</h1>
+        <p>
+          본 페이지는 웹사이트 정보 구조 비교 실험을 위한 계층형 프로토타입이다.
+          홈에서 카테고리를 선택하고, 카테고리 목록에서 상품을 고른 뒤, 상세 페이지에서 구매 정보를 확인하는 구조로 설계했다.
+        </p>
+        <div class="hero-tags">
+          <span class="hero-tag">홈 → 카테고리 → 목록 → 상세</span>
+          <span class="hero-tag">전체 상품 28개</span>
+          <span class="hero-tag">카테고리 7개</span>
+          <span class="hero-tag">실험용 단계 탐색 구조</span>
+        </div>
+      </div>
+      <div class="hero-card">
+        <h3>실험 문제 구성</h3>
+        <ul>
+          <li>1~3번: 단순 탐색 문제</li>
+          <li>4~6번: 복합 조건 비교 문제</li>
+          <li>문제 번호 입력 시 상단에 자동 표시</li>
+          <li>상세 페이지에서 선택하기 버튼으로 자동 채점</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="breadcrumb panel" id="breadcrumb">
+      <span>홈</span>
+    </section>
+
+    <section class="view active" id="homeView">
+      <div class="home-grid" id="categoryGrid"></div>
+    </section>
+
+    <section class="view" id="listView">
+      <div class="list-layout">
+        <aside class="sidebar panel">
+          <h3>상품 목록 필터</h3>
+
+          <div class="filter-block">
+            <h4>선택한 카테고리</h4>
+            <div id="currentCategoryLabel" style="font-size:15px; font-weight:700; color:#111827;">-</div>
+          </div>
+
+          <div class="filter-block">
+            <h4>가격 범위</h4>
+            <div class="price-range">
+              <input type="number" id="minPrice" placeholder="최소" />
+              <input type="number" id="maxPrice" placeholder="최대" />
+            </div>
+          </div>
+
+          <div class="filter-block">
+            <h4>조건</h4>
+            <div class="filter-list">
+              <label class="filter-item"><input type="checkbox" id="freeShipping" /> 무료배송만 보기</label>
+              <label class="filter-item"><input type="checkbox" id="highRating" /> 평점 4.5 이상</label>
+              <label class="filter-item"><input type="checkbox" id="discountOnly" /> 할인 상품만 보기</label>
+            </div>
+          </div>
+
+          <button class="apply-btn" id="applyFilters">필터 적용</button>
+          <button class="reset-btn" id="resetFilters">필터 초기화</button>
+          <button class="back-btn" id="backToHomeBtn">카테고리 홈으로</button>
+        </aside>
+
+        <section class="content-panel panel">
+          <div class="stats-bar">
+            <div class="stats-left">
+              <div class="stat-box"><strong id="resultCount">0</strong>검색 결과</div>
+              <div class="stat-box"><strong id="avgPrice">-</strong>평균 가격</div>
+              <div class="stat-box"><strong id="topRating">-</strong>최고 평점</div>
+            </div>
+            <div class="sort-box">
+              <select id="sortSelect">
+                <option value="default">기본순</option>
+                <option value="priceAsc">가격 낮은순</option>
+                <option value="priceDesc">가격 높은순</option>
+                <option value="ratingDesc">평점 높은순</option>
+                <option value="discountDesc">할인율 높은순</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="product-grid" id="productGrid"></div>
+          <div class="empty-state" id="emptyState">조건에 맞는 상품이 없습니다.</div>
+        </section>
+      </div>
+    </section>
+
+    <section class="view" id="detailView">
+      <div class="detail-layout">
+        <div class="detail-thumb panel" id="detailEmoji"></div>
+        <div class="detail-card panel">
+          <div class="category-label" id="detailCategory"></div>
+          <h2 class="detail-title" id="detailTitle"></h2>
+          <div class="detail-meta" id="detailFeature"></div>
+          <div class="detail-price" id="detailPrice"></div>
+          <div class="rating" id="detailRating"></div>
+
+          <div class="detail-grid-info">
+            <div class="info-box"><strong>정가</strong><span id="detailOriginal"></span></div>
+            <div class="info-box"><strong>할인율</strong><span id="detailDiscount"></span></div>
+            <div class="info-box"><strong>배송 정보</strong><span id="detailShipping"></span></div>
+            <div class="info-box"><strong>재고 상태</strong><span id="detailStock"></span></div>
+            <div class="info-box"><strong>브랜드</strong><span id="detailBrand"></span></div>
+            <div class="info-box"><strong>카테고리</strong><span id="detailCategoryName"></span></div>
+          </div>
+
+          <div class="detail-actions">
+            <button class="select-btn" id="selectProductBtn">선택하기</button>
+            <button class="ghost-btn">장바구니 담기</button>
+            <button class="ghost-btn" id="backToListBtn">목록으로 돌아가기</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    NeoPick Prototype · UX 실험용 계층형 전자제품 쇼핑몰 · VS Code에서 실행 가능
+  </footer>
+
+  <script>
+    const tasks = {
+      "1": "1번 문제: 5만원 이하의 무선 이어폰 1개를 찾으시오.",
+      "2": "2번 문제: 무료배송인 보조배터리 1개를 찾으시오.",
+      "3": "3번 문제: 평점 4.5 이상인 마우스 1개를 찾으시오.",
+      "4": "4번 문제: 6만원 이하이면서 평점 4.5 이상인 상품 1개를 찾으시오.",
+      "5": "5번 문제: 무료배송이고 할인 중인 충전기 1개를 찾으시오.",
+      "6": "6번 문제: 가격, 평점, 배송 조건을 모두 고려해 가장 적절한 이어폰 1개를 선택하시오."
+    };
+
+    const answerKey = {
+      "1": ["NeoBuds Air Lite"],
+      "2": ["PowerBox 10000", "UltraCell 20000", "MagCharge Snap"],
+      "3": ["ProAim G5", "Creator Pad Mouse"],
+      "4": ["BeatFlow Fit", "GameVoice X7", "ProAim G5"],
+      "5": ["FastCharge 65W", "DualPort GaN 45W", "Slim Charger Cube"],
+      "6": ["SoundPeak ANC Pro"]
+    };
+
+    const products = [
+      { id: 1, category: "이어폰", emoji: "🎧", name: "NeoBuds Air Lite", price: 39000, originalPrice: 49000, rating: 4.3, shipping: 0, discount: 20, stock: "재고 있음", delivery: "내일 도착", feature: "무선 블루투스, 18시간 사용", brand: "NeoSound" },
+      { id: 2, category: "이어폰", emoji: "🎧", name: "SoundPeak ANC Pro", price: 89000, originalPrice: 109000, rating: 4.7, shipping: 0, discount: 18, stock: "재고 있음", delivery: "로켓배송", feature: "노이즈 캔슬링, 무선충전", brand: "SoundPeak" },
+      { id: 3, category: "이어폰", emoji: "🎧", name: "BeatFlow Fit", price: 57000, originalPrice: 57000, rating: 4.5, shipping: 3000, discount: 0, stock: "재고 있음", delivery: "일반배송", feature: "운동용 방수, 귀걸이형", brand: "BeatFlow" },
+      { id: 4, category: "이어폰", emoji: "🎧", name: "MeloPods Mini", price: 29900, originalPrice: 35900, rating: 4.1, shipping: 0, discount: 16, stock: "재고 적음", delivery: "내일 도착", feature: "초경량, 학생용 가성비", brand: "Melo" },
+      { id: 5, category: "헤드셋", emoji: "🎮", name: "GameVoice X7", price: 69000, originalPrice: 89000, rating: 4.6, shipping: 0, discount: 22, stock: "재고 있음", delivery: "로켓배송", feature: "게이밍 마이크, 7.1채널", brand: "GameVoice" },
+      { id: 6, category: "헤드셋", emoji: "🎮", name: "StudyHead Comfort", price: 42000, originalPrice: 42000, rating: 4.2, shipping: 3000, discount: 0, stock: "재고 있음", delivery: "일반배송", feature: "온라인 수업용, 장시간 착용", brand: "EduSound" },
+      { id: 7, category: "헤드셋", emoji: "🎮", name: "QuietTune Max", price: 129000, originalPrice: 149000, rating: 4.8, shipping: 0, discount: 13, stock: "재고 있음", delivery: "내일 도착", feature: "프리미엄 노이즈 캔슬링", brand: "QuietTune" },
+      { id: 8, category: "헤드셋", emoji: "🎮", name: "BassBoom Studio", price: 99000, originalPrice: 119000, rating: 4.4, shipping: 0, discount: 17, stock: "재고 적음", delivery: "일반배송", feature: "저음 강화, 접이식", brand: "BassBoom" },
+      { id: 9, category: "키보드", emoji: "⌨️", name: "ClickType TKL", price: 51000, originalPrice: 62000, rating: 4.5, shipping: 0, discount: 18, stock: "재고 있음", delivery: "로켓배송", feature: "텐키리스, 기계식", brand: "ClickType" },
+      { id: 10, category: "키보드", emoji: "⌨️", name: "SilentBoard Office", price: 33000, originalPrice: 33000, rating: 4.2, shipping: 3000, discount: 0, stock: "재고 있음", delivery: "일반배송", feature: "저소음 멤브레인", brand: "OfficeLab" },
+      { id: 11, category: "키보드", emoji: "⌨️", name: "RGB Master K87", price: 78000, originalPrice: 95000, rating: 4.7, shipping: 0, discount: 18, stock: "재고 있음", delivery: "내일 도착", feature: "RGB 조명, 핫스왑 지원", brand: "RGB Master" },
+      { id: 12, category: "키보드", emoji: "⌨️", name: "AirKeys Fold", price: 46000, originalPrice: 52000, rating: 4.3, shipping: 0, discount: 12, stock: "재고 적음", delivery: "일반배송", feature: "블루투스 접이식 키보드", brand: "AirKeys" },
+      { id: 13, category: "마우스", emoji: "🖱️", name: "SwiftMouse S1", price: 27000, originalPrice: 34000, rating: 4.4, shipping: 0, discount: 21, stock: "재고 있음", delivery: "로켓배송", feature: "무선, 저소음 클릭", brand: "Swift" },
+      { id: 14, category: "마우스", emoji: "🖱️", name: "ProAim G5", price: 58000, originalPrice: 69000, rating: 4.6, shipping: 0, discount: 16, stock: "재고 있음", delivery: "내일 도착", feature: "게이밍, DPI 16000", brand: "ProAim" },
+      { id: 15, category: "마우스", emoji: "🖱️", name: "Office Glide M3", price: 19000, originalPrice: 19000, rating: 4.1, shipping: 3000, discount: 0, stock: "재고 있음", delivery: "일반배송", feature: "사무용 기본형", brand: "OfficeLab" },
+      { id: 16, category: "마우스", emoji: "🖱️", name: "Creator Pad Mouse", price: 43000, originalPrice: 48000, rating: 4.5, shipping: 0, discount: 10, stock: "재고 적음", delivery: "일반배송", feature: "멀티디바이스 연결", brand: "CreatorPad" },
+      { id: 17, category: "태블릿", emoji: "📱", name: "StudyTab 10", price: 289000, originalPrice: 329000, rating: 4.5, shipping: 0, discount: 12, stock: "재고 있음", delivery: "로켓배송", feature: "10인치, 필기 지원", brand: "StudyTab" },
+      { id: 18, category: "태블릿", emoji: "📱", name: "MediaTab Plus", price: 359000, originalPrice: 399000, rating: 4.6, shipping: 0, discount: 10, stock: "재고 있음", delivery: "내일 도착", feature: "고해상도, 영상 감상용", brand: "MediaOne" },
+      { id: 19, category: "태블릿", emoji: "📱", name: "LitePad 8", price: 219000, originalPrice: 249000, rating: 4.2, shipping: 3000, discount: 12, stock: "재고 적음", delivery: "일반배송", feature: "휴대성 중심 8인치", brand: "LitePad" },
+      { id: 20, category: "태블릿", emoji: "📱", name: "NoteTab Air", price: 429000, originalPrice: 479000, rating: 4.8, shipping: 0, discount: 10, stock: "재고 있음", delivery: "로켓배송", feature: "필기 특화, 고주사율", brand: "NoteTab" },
+      { id: 21, category: "충전기", emoji: "🔌", name: "FastCharge 65W", price: 29000, originalPrice: 35000, rating: 4.6, shipping: 0, discount: 17, stock: "재고 있음", delivery: "내일 도착", feature: "노트북 겸용 고속충전", brand: "FastCharge" },
+      { id: 22, category: "충전기", emoji: "🔌", name: "Pocket Charger 25W", price: 15000, originalPrice: 15000, rating: 4.2, shipping: 3000, discount: 0, stock: "재고 있음", delivery: "일반배송", feature: "휴대용 기본 충전기", brand: "Pocket" },
+      { id: 23, category: "충전기", emoji: "🔌", name: "DualPort GaN 45W", price: 34000, originalPrice: 39000, rating: 4.5, shipping: 0, discount: 12, stock: "재고 있음", delivery: "로켓배송", feature: "2포트 동시 충전", brand: "GaNTech" },
+      { id: 24, category: "충전기", emoji: "🔌", name: "Slim Charger Cube", price: 22000, originalPrice: 27000, rating: 4.1, shipping: 0, discount: 18, stock: "재고 적음", delivery: "일반배송", feature: "초소형 큐브형", brand: "SlimCube" },
+      { id: 25, category: "보조배터리", emoji: "🔋", name: "PowerBox 10000", price: 32000, originalPrice: 39000, rating: 4.4, shipping: 0, discount: 18, stock: "재고 있음", delivery: "로켓배송", feature: "10000mAh, 경량형", brand: "PowerBox" },
+      { id: 26, category: "보조배터리", emoji: "🔋", name: "UltraCell 20000", price: 49000, originalPrice: 59000, rating: 4.7, shipping: 0, discount: 17, stock: "재고 있음", delivery: "내일 도착", feature: "20000mAh, 고속충전", brand: "UltraCell" },
+      { id: 27, category: "보조배터리", emoji: "🔋", name: "Mini Juice 5000", price: 21000, originalPrice: 21000, rating: 4.0, shipping: 3000, discount: 0, stock: "재고 적음", delivery: "일반배송", feature: "초경량 주머니형", brand: "MiniJuice" },
+      { id: 28, category: "보조배터리", emoji: "🔋", name: "MagCharge Snap", price: 41000, originalPrice: 47000, rating: 4.5, shipping: 0, discount: 13, stock: "재고 있음", delivery: "로켓배송", feature: "맥세이프 호환", brand: "MagCharge" }
+    ];
+
+    const categories = [
+      { name: "이어폰", emoji: "🎧", desc: "무선 이어폰, 학생용 가성비, ANC 제품 비교" },
+      { name: "헤드셋", emoji: "🎮", desc: "게이밍, 온라인 수업, 노이즈 캔슬링 헤드셋" },
+      { name: "키보드", emoji: "⌨️", desc: "기계식, 저소음, 휴대용 블루투스 키보드" },
+      { name: "마우스", emoji: "🖱️", desc: "무선, 게이밍, 사무용 마우스 탐색" },
+      { name: "태블릿", emoji: "📱", desc: "필기용, 영상 감상용, 휴대형 태블릿 비교" },
+      { name: "충전기", emoji: "🔌", desc: "고속충전, 휴대용, 멀티포트 충전기" },
+      { name: "보조배터리", emoji: "🔋", desc: "용량, 무게, 고속충전 조건 비교" }
+    ];
+
+    const state = {
+      currentView: "home",
+      currentCategory: null,
+      currentProductId: null,
+      previousCategory: null
+    };
+
+    const experimentData = {
+      participantId: "",
+      taskNumber: "",
+      taskText: "",
+      startTime: null,
+      endTime: null,
+      elapsedSeconds: 0,
+      clickCount: 0,
+      pathLog: [],
+      selectedProduct: "",
+      isRunning: false,
+      isCorrect: null,
+      correctAnswers: []
+    };
+
+    const homeView = document.getElementById("homeView");
+    const listView = document.getElementById("listView");
+    const detailView = document.getElementById("detailView");
+    const breadcrumb = document.getElementById("breadcrumb");
+    const categoryGrid = document.getElementById("categoryGrid");
+    const productGrid = document.getElementById("productGrid");
+    const emptyState = document.getElementById("emptyState");
+    const currentCategoryLabel = document.getElementById("currentCategoryLabel");
+    const resultCount = document.getElementById("resultCount");
+    const avgPrice = document.getElementById("avgPrice");
+    const topRating = document.getElementById("topRating");
+    const sortSelect = document.getElementById("sortSelect");
+    const searchInput = document.getElementById("searchInput");
+    const headerCategorySelect = document.getElementById("headerCategorySelect");
+    const minPriceInput = document.getElementById("minPrice");
+    const maxPriceInput = document.getElementById("maxPrice");
+    const freeShipping = document.getElementById("freeShipping");
+    const highRating = document.getElementById("highRating");
+    const discountOnly = document.getElementById("discountOnly");
+
+    const detailEmoji = document.getElementById("detailEmoji");
+    const detailCategory = document.getElementById("detailCategory");
+    const detailTitle = document.getElementById("detailTitle");
+    const detailFeature = document.getElementById("detailFeature");
+    const detailPrice = document.getElementById("detailPrice");
+    const detailRating = document.getElementById("detailRating");
+    const detailOriginal = document.getElementById("detailOriginal");
+    const detailDiscount = document.getElementById("detailDiscount");
+    const detailShipping = document.getElementById("detailShipping");
+    const detailStock = document.getElementById("detailStock");
+    const detailBrand = document.getElementById("detailBrand");
+    const detailCategoryName = document.getElementById("detailCategoryName");
+    const selectProductBtn = document.getElementById("selectProductBtn");
+
+    const participantIdInput = document.getElementById("participantId");
+    const taskNumberInput = document.getElementById("taskNumber");
+    const startExperimentBtn = document.getElementById("startExperimentBtn");
+    const stopExperimentBtn = document.getElementById("stopExperimentBtn");
+    const viewResultBtn = document.getElementById("viewResultBtn");
+    const resetExperimentBtn = document.getElementById("resetExperimentBtn");
+    const experimentStatus = document.getElementById("experimentStatus");
+    const taskDisplay = document.getElementById("taskDisplay");
+    const resultBox = document.getElementById("resultBox");
+
+    function formatPrice(value) {
+      return value.toLocaleString("ko-KR") + "원";
+    }
+
+    function getTaskText(taskNumber) {
+      return tasks[taskNumber] || "유효한 문제 번호가 아님. 1~6 중에서 입력하세요.";
+    }
+
+    function updateTaskDisplay() {
+      const taskNumber = taskNumberInput.value.trim();
+      taskDisplay.textContent = getTaskText(taskNumber);
+    }
+
+    function addPath(action, detail = "") {
+      if (!experimentData.isRunning) return;
+      experimentData.pathLog.push({
+        step: experimentData.pathLog.length + 1,
+        time: new Date().toLocaleTimeString(),
+        action,
+        detail
+      });
+    }
+
+    function updateStatus(text) {
+      experimentStatus.textContent = text;
+    }
+
+    function startExperiment() {
+      const participantId = participantIdInput.value.trim() || "P1";
+      const taskNumber = taskNumberInput.value.trim() || "1";
+      const taskText = getTaskText(taskNumber);
+
+      if (!tasks[taskNumber]) {
+        alert("문제 번호는 1~6 중에서 입력해야 함");
+        return;
+      }
+
+      experimentData.participantId = participantId;
+      experimentData.taskNumber = taskNumber;
+      experimentData.taskText = taskText;
+      experimentData.startTime = Date.now();
+      experimentData.endTime = null;
+      experimentData.elapsedSeconds = 0;
+      experimentData.clickCount = 0;
+      experimentData.pathLog = [];
+      experimentData.selectedProduct = "";
+      experimentData.isRunning = true;
+      experimentData.isCorrect = null;
+      experimentData.correctAnswers = answerKey[taskNumber] || [];
+
+      resultBox.style.display = "none";
+      resultBox.innerHTML = "";
+
+      addPath("실험 시작", `참가자 ${participantId}, 문제 ${taskNumber}`);
+      addPath("문제 내용", taskText);
+      updateStatus(`실험 진행 중 · 참가자 ${participantId} · 문제 ${taskNumber}`);
+      taskDisplay.textContent = taskText;
+
+      alert(`실험 시작\n참가자: ${participantId}\n${taskText}`);
+    }
+
+    function endExperiment(autoSelected = false) {
+      if (!experimentData.isRunning || !experimentData.startTime) return;
+
+      experimentData.endTime = Date.now();
+      experimentData.elapsedSeconds = ((experimentData.endTime - experimentData.startTime) / 1000).toFixed(2);
+      experimentData.isRunning = false;
+
+      if (autoSelected) {
+        updateStatus(`실험 종료 · ${experimentData.elapsedSeconds}초 · 상품 선택 완료`);
+      } else {
+        updateStatus(`실험 종료 · ${experimentData.elapsedSeconds}초`);
+      }
+    }
+
+    function gradeAnswer(selectedProduct) {
+      const answers = answerKey[experimentData.taskNumber] || [];
+      experimentData.correctAnswers = answers;
+      experimentData.isCorrect = answers.includes(selectedProduct);
+    }
+
+    function renderResultBox() {
+      const correctText = experimentData.correctAnswers.length > 0
+        ? experimentData.correctAnswers.join(", ")
+        : "없음";
+
+      let judgmentText = "미채점";
+      if (experimentData.isCorrect === true) judgmentText = "정답";
+      if (experimentData.isCorrect === false) judgmentText = "오답";
+
+      resultBox.innerHTML = `
+        <strong>참가자:</strong> ${experimentData.participantId || "-"}<br>
+        <strong>문제 번호:</strong> ${experimentData.taskNumber || "-"}<br>
+        <strong>문제 내용:</strong> ${experimentData.taskText || "-"}<br>
+        <strong>선택 상품:</strong> ${experimentData.selectedProduct || "없음"}<br>
+        <strong>정답 상품:</strong> ${correctText}<br>
+        <strong>채점 결과:</strong> ${judgmentText}<br>
+        <strong>수행 시간:</strong> ${experimentData.elapsedSeconds || 0}초<br>
+        <strong>클릭 수:</strong> ${experimentData.clickCount}
+      `;
+      resultBox.style.display = "block";
+    }
+
+    function viewResult() {
+      const result = {
+        participantId: experimentData.participantId,
+        taskNumber: experimentData.taskNumber,
+        taskText: experimentData.taskText,
+        elapsedSeconds: experimentData.elapsedSeconds,
+        clickCount: experimentData.clickCount,
+        selectedProduct: experimentData.selectedProduct,
+        correctAnswers: experimentData.correctAnswers,
+        isCorrect: experimentData.isCorrect,
+        pathLog: experimentData.pathLog
+      };
+
+      console.log("실험 결과", result);
+      renderResultBox();
+
+      let judgmentText = "미채점";
+      if (experimentData.isCorrect === true) judgmentText = "정답";
+      if (experimentData.isCorrect === false) judgmentText = "오답";
+
+      alert(
+        `참가자: ${result.participantId || "-"}\n` +
+        `문제 번호: ${result.taskNumber || "-"}\n` +
+        `문제 내용: ${result.taskText || "-"}\n` +
+        `선택 상품: ${result.selectedProduct || "없음"}\n` +
+        `채점 결과: ${judgmentText}\n` +
+        `수행 시간: ${result.elapsedSeconds || 0}초\n` +
+        `클릭 수: ${result.clickCount}\n\n` +
+        `자세한 이동 경로는 F12 → Console에서 확인`
+      );
+    }
+
+    function resetExperiment() {
+      experimentData.participantId = "";
+      experimentData.taskNumber = "";
+      experimentData.taskText = "";
+      experimentData.startTime = null;
+      experimentData.endTime = null;
+      experimentData.elapsedSeconds = 0;
+      experimentData.clickCount = 0;
+      experimentData.pathLog = [];
+      experimentData.selectedProduct = "";
+      experimentData.isRunning = false;
+      experimentData.isCorrect = null;
+      experimentData.correctAnswers = [];
+
+      participantIdInput.value = "";
+      taskNumberInput.value = "";
+      taskDisplay.textContent = "문제 번호를 1~6 중 하나로 입력하면 여기 표시됨";
+      updateStatus("실험 대기 중");
+      resultBox.style.display = "none";
+      resultBox.innerHTML = "";
+      alert("실험 기록이 초기화되었습니다.");
+    }
+
+    function setView(view) {
+      state.currentView = view;
+      [homeView, listView, detailView].forEach(v => v.classList.remove("active"));
+      if (view === "home") homeView.classList.add("active");
+      if (view === "list") listView.classList.add("active");
+      if (view === "detail") detailView.classList.add("active");
+      renderBreadcrumb();
+    }
+
+    function renderBreadcrumb() {
+      let html = `<span style="cursor:pointer;" onclick="goHome()">홈</span>`;
+
+      if (state.currentCategory) {
+        html += `<span>›</span><span style="cursor:pointer;" onclick="openCategory('${state.currentCategory}')">카테고리</span>`;
+        html += `<span>›</span><strong>${state.currentCategory}</strong>`;
+      }
+
+      if (state.currentProductId) {
+        const product = products.find(p => p.id === state.currentProductId);
+        if (product) {
+          html += `<span>›</span><strong>${product.name}</strong>`;
+        }
+      }
+
+      breadcrumb.innerHTML = html;
+    }
+
+    function renderCategories() {
+      categoryGrid.innerHTML = categories.map(category => {
+        const count = products.filter(product => product.category === category.name).length;
+        return `
+          <article class="category-card" onclick="openCategory('${category.name}')">
+            <div class="category-emoji">${category.emoji}</div>
+            <div class="category-name">${category.name}</div>
+            <div class="category-desc">${category.desc}</div>
+            <div class="category-count">상품 ${count}개 보기</div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function getFilteredProducts() {
+      const keyword = searchInput.value.trim().toLowerCase();
+      const minPrice = Number(minPriceInput.value) || 0;
+      const maxPrice = Number(maxPriceInput.value) || Infinity;
+
+      let filtered = products.filter(product => {
+        const matchesCategory = state.currentCategory ? product.category === state.currentCategory : true;
+        const matchesKeyword =
+          product.name.toLowerCase().includes(keyword) ||
+          product.category.toLowerCase().includes(keyword) ||
+          product.feature.toLowerCase().includes(keyword) ||
+          product.brand.toLowerCase().includes(keyword);
+        const matchesPrice = product.price >= minPrice && product.price <= maxPrice;
+        const matchesShipping = freeShipping.checked ? product.shipping === 0 : true;
+        const matchesRating = highRating.checked ? product.rating >= 4.5 : true;
+        const matchesDiscount = discountOnly.checked ? product.discount > 0 : true;
+
+        return matchesCategory && matchesKeyword && matchesPrice && matchesShipping && matchesRating && matchesDiscount;
+      });
+
+      switch (sortSelect.value) {
+        case "priceAsc":
+          filtered.sort((a, b) => a.price - b.price);
+          break;
+        case "priceDesc":
+          filtered.sort((a, b) => b.price - a.price);
+          break;
+        case "ratingDesc":
+          filtered.sort((a, b) => b.rating - a.rating);
+          break;
+        case "discountDesc":
+          filtered.sort((a, b) => b.discount - a.discount);
+          break;
+      }
+
+      return filtered;
+    }
+
+    function updateStats(items) {
+      resultCount.textContent = items.length;
+      if (items.length === 0) {
+        avgPrice.textContent = "-";
+        topRating.textContent = "-";
+        return;
+      }
+      const average = Math.round(items.reduce((sum, item) => sum + item.price, 0) / items.length);
+      avgPrice.textContent = formatPrice(average);
+      const bestRating = Math.max(...items.map(item => item.rating));
+      topRating.textContent = bestRating.toFixed(1);
+    }
+
+    function createProductCard(product) {
+      return `
+        <article class="product-card" onclick="openDetail(${product.id})">
+          <div class="thumb">${product.emoji}</div>
+          <div class="badge-row">
+            ${product.discount > 0 ? `<span class="badge">-${product.discount}%</span>` : ``}
+            ${product.shipping === 0 ? `<span class="badge">무료배송</span>` : ``}
+          </div>
+          <div class="category-label">${product.category} · ${product.brand}</div>
+          <div class="product-name">${product.name}</div>
+          <div class="meta">${product.feature}</div>
+          <div>
+            <span class="price">${formatPrice(product.price)}</span>
+            ${product.originalPrice > product.price ? `<span class="sub-price">${formatPrice(product.originalPrice)}</span>` : ``}
+          </div>
+          <div class="rating">★ ${product.rating.toFixed(1)}</div>
+          <div class="shipping">${product.shipping === 0 ? product.delivery + ' · 무료배송' : product.delivery + ' · 배송비 ' + formatPrice(product.shipping)}</div>
+        </article>
+      `;
+    }
+
+    function renderProductList() {
+      currentCategoryLabel.textContent = state.currentCategory || "-";
+      const filtered = getFilteredProducts();
+      updateStats(filtered);
+
+      if (filtered.length === 0) {
+        productGrid.innerHTML = "";
+        emptyState.style.display = "block";
+        return;
+      }
+
+      emptyState.style.display = "none";
+      productGrid.innerHTML = filtered.map(createProductCard).join("");
+    }
+
+    function openCategory(categoryName) {
+      state.currentCategory = categoryName;
+      state.currentProductId = null;
+      headerCategorySelect.value = categoryName;
+      addPath("카테고리 이동", categoryName);
+      setView("list");
+      renderProductList();
+    }
+
+    function openDetail(id) {
+      const product = products.find(item => item.id === id);
+      if (!product) return;
+
+      state.previousCategory = state.currentCategory;
+      state.currentProductId = id;
+      state.currentCategory = product.category;
+
+      detailEmoji.textContent = product.emoji;
+      detailCategory.textContent = `${product.category} · ${product.brand}`;
+      detailTitle.textContent = product.name;
+      detailFeature.textContent = product.feature;
+      detailPrice.textContent = formatPrice(product.price);
+      detailRating.textContent = `★ ${product.rating.toFixed(1)} / 5.0`;
+      detailOriginal.textContent = formatPrice(product.originalPrice);
+      detailDiscount.textContent = `${product.discount}%`;
+      detailShipping.textContent = product.shipping === 0 ? `${product.delivery} · 무료배송` : `${product.delivery} · 배송비 ${formatPrice(product.shipping)}`;
+      detailStock.textContent = product.stock;
+      detailBrand.textContent = product.brand;
+      detailCategoryName.textContent = product.category;
+
+      addPath("상세페이지 이동", product.name);
+      setView("detail");
+    }
+
+    function selectCurrentProduct() {
+      const product = products.find(item => item.id === state.currentProductId);
+      if (!product) return;
+
+      experimentData.selectedProduct = product.name;
+      addPath("상품 선택", product.name);
+
+      if (experimentData.taskNumber) {
+        gradeAnswer(product.name);
+      }
+
+      if (experimentData.isRunning) {
+        endExperiment(true);
+      }
+
+      renderResultBox();
+
+      let judgmentText = "미채점";
+      if (experimentData.isCorrect === true) judgmentText = "정답";
+      if (experimentData.isCorrect === false) judgmentText = "오답";
+
+      alert(
+        `선택한 상품: ${product.name}\n` +
+        `채점 결과: ${judgmentText}\n` +
+        `수행 시간: ${experimentData.elapsedSeconds || 0}초\n` +
+        `클릭 수: ${experimentData.clickCount}`
+      );
+    }
+
+    function goHome() {
+      state.currentCategory = null;
+      state.currentProductId = null;
+      headerCategorySelect.value = "all";
+      addPath("홈 이동");
+      setView("home");
+    }
+
+    function backToList() {
+      state.currentProductId = null;
+      state.currentCategory = state.previousCategory || state.currentCategory;
+      headerCategorySelect.value = state.currentCategory || "all";
+      addPath("목록으로 복귀", state.currentCategory || "");
+      setView("list");
+      renderProductList();
+    }
+
+    function resetListFilters() {
+      minPriceInput.value = "";
+      maxPriceInput.value = "";
+      freeShipping.checked = false;
+      highRating.checked = false;
+      discountOnly.checked = false;
+      sortSelect.value = "default";
+      addPath("필터 초기화");
+      renderProductList();
+    }
+
+    document.addEventListener("click", function(e) {
+      const target = e.target.closest("button, input, select, .product-card, .category-card, .logo");
+      if (!target || !experimentData.isRunning) return;
+
+      experimentData.clickCount++;
+
+      const label =
+        target.innerText?.trim() ||
+        target.id ||
+        target.className ||
+        target.tagName;
+
+      addPath("클릭", label);
+    });
+
+    document.getElementById("logoBtn").addEventListener("click", goHome);
+    document.getElementById("applyFilters").addEventListener("click", () => {
+      addPath("필터 적용");
+      renderProductList();
+    });
+    document.getElementById("resetFilters").addEventListener("click", resetListFilters);
+    document.getElementById("backToHomeBtn").addEventListener("click", goHome);
+    document.getElementById("backToListBtn").addEventListener("click", backToList);
+    selectProductBtn.addEventListener("click", selectCurrentProduct);
+
+    sortSelect.addEventListener("change", () => {
+      addPath("정렬 변경", sortSelect.value);
+      renderProductList();
+    });
+
+    searchInput.addEventListener("input", () => {
+      addPath("검색 입력", searchInput.value);
+      if (state.currentView === "home" && searchInput.value.trim() !== "") {
+        state.currentCategory = headerCategorySelect.value === "all" ? categories[0].name : headerCategorySelect.value;
+        if (headerCategorySelect.value === "all") {
+          headerCategorySelect.value = state.currentCategory;
+        }
+        setView("list");
+      }
+      if (state.currentView !== "home") renderProductList();
+    });
+
+    headerCategorySelect.addEventListener("change", () => {
+      if (headerCategorySelect.value === "all") {
+        goHome();
+        return;
+      }
+      openCategory(headerCategorySelect.value);
+    });
+
+    [freeShipping, highRating, discountOnly].forEach(input => {
+      input.addEventListener("change", () => {
+        addPath("조건 변경", input.id);
+        renderProductList();
+      });
+    });
+
+    taskNumberInput.addEventListener("input", updateTaskDisplay);
+
+    startExperimentBtn.addEventListener("click", startExperiment);
+    stopExperimentBtn.addEventListener("click", () => {
+      endExperiment(false);
+      renderResultBox();
+      alert(`실험 종료\n수행 시간: ${experimentData.elapsedSeconds || 0}초\n클릭 수: ${experimentData.clickCount}`);
+    });
+    viewResultBtn.addEventListener("click", viewResult);
+    resetExperimentBtn.addEventListener("click", resetExperiment);
+
+    window.openCategory = openCategory;
+    window.openDetail = openDetail;
+    window.goHome = goHome;
+
+    renderCategories();
+    renderBreadcrumb();
+  </script>
+</body>
+</html>
